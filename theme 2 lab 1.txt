@@ -1,0 +1,59 @@
+#include<iostream>
+#include<thread>
+#include<condition_variable>
+
+#include "UserInterruptHandler.h"
+
+using namespace std;
+
+
+UserInterruptHandler h;
+mutex m;
+condition_variable cv;
+bool ready = false;
+
+void worker_thread(int id) {
+    while (!h.checkInterruption()) {
+        unique_lock<mutex> lock(m);
+        cv.wait(lock, [] {return ready; });
+        if (!h.checkInterruption()) {
+            cout << "Thread " << id << endl;
+            ready = false;
+        }            
+        else {
+            cout << "Thread " << id << " exited" << endl;
+        }
+        
+        lock.unlock();
+        
+    }
+}
+
+int main() {
+    
+    int n; 
+    cin >> n;
+        
+    thread* threads = new thread[n];
+    for (int i = 0; i < n; i++) {
+        threads[i] = thread(worker_thread,i);
+    }
+
+    while (!h.checkInterruption())
+    {    
+        this_thread::sleep_for(chrono::seconds(1));
+        ready = true;
+        cv.notify_one();
+        
+        
+    }
+    ready = true;
+
+    cv.notify_all();
+
+    for (int i = 0; i < n; i++) {
+        if (threads[i].joinable())
+            threads[i].join();
+    }
+}
+//theme 2 lab 1

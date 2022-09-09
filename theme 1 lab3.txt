@@ -1,0 +1,64 @@
+//theme 1 lab 3
+//NOTE: this can be done easier using map and filter functions
+
+
+import re
+
+def readNum(): 
+    return int(input())
+
+def readStr():
+    return input()
+
+def readArr(mylist:list,size:int):
+    if(len(mylist)<size):
+        mylist.append(readStr())
+        return readArr(mylist,size)
+    return mylist
+
+def readArrWrapper(size:int):
+    return readArr([],size)
+
+def makeTableWrapper(mylist:list):
+    name_pattern= "[A-Za-z][A-Za-z\\s]*[A-Za-z]"
+    num_pattern= "[0-9.]+"
+    return maketable(mylist,[[],[],[]],name_pattern,num_pattern)
+
+
+def maketable(mylist:list, retlist:list, namepattern, numpattern, i=0):
+    if i< len(mylist):
+        x= re.search(namepattern,mylist[i])[0]
+        y= re.findall(numpattern,mylist[i])[0]
+        z= re.findall(numpattern,mylist[i])[1]
+        retlist[0].append(x)
+        retlist[1].append(y)
+        retlist[2].append(z)
+        return maketable(mylist,retlist,namepattern,numpattern,i=i+1)
+    return retlist
+
+def processDataWrapper(mylist:list):
+    return processData(mylist,[[],[],[]])
+
+def processData(mylist:list, retlist:list, i=0):
+    if i< len(mylist[0]):
+        if mylist[2][i]!='0':
+            retlist[0].append(mylist[0][i])
+            retlist[1].append(mylist[1][i])
+            retlist[2].append(increasebypercent(float(mylist[2][i]),42))
+        return processData(mylist,retlist,i=i+1)
+    return retlist
+
+
+def increasebypercent(num, percent):
+    return round(num+(percent/100*num),2)
+
+def printall(mylist:list,i=0):
+    if i< len(mylist[0]):
+        print(mylist[0][i],end=" ")
+        print(mylist[1][i],end=" ")
+        print(mylist[2][i])
+        printall(mylist,i=i+1)
+
+
+ 
+printall(processDataWrapper(makeTableWrapper(readArrWrapper(readNum()))))

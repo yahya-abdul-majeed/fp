@@ -1,0 +1,86 @@
+```
+//theme 2 lab 2
+#include <iostream>
+#include<thread>	
+#include<future>
+#include<chrono>
+#include<vector>
+#include<cmath>
+
+using namespace std;
+
+
+
+pair<int,int> worker_thread(vector<int> v) {
+        
+    pair<int, int> mypair;
+    int min = INT_MAX, max = INT_MIN;
+    for (int i = 0; i < v.size(); i++) {
+        if (v[i] < min)
+            min = v[i];
+        if (v[i] > max)
+            max = v[i];
+    }
+    mypair.first = min;
+    mypair.second = max;
+    
+    cout << "thread " << this_thread::get_id() << " exited\n";
+    return mypair;
+  
+}
+
+
+
+int main()
+{
+	
+    int n;
+    cin >> n;
+    vector<int> v;
+    srand((unsigned)time(NULL));
+
+    for (int i = 0; i < n; i++) {
+        v.push_back(rand());
+    }
+
+    for (int i = 1; i <= 4; i++) {
+       
+        int min = INT_MAX, max = INT_MIN;
+        int pw = pow(2, i);
+        future <pair<int,int>>* fut = new future<pair<int,int>>[pw];
+        int n = 0;
+        int div = v.size() / pw;
+        chrono::system_clock::time_point start_time = chrono::system_clock::now();
+        vector<int>::iterator last_end = v.begin();
+        for (int j = 0; j < pw; j++) {
+            if (j == pw - 1) {
+                vector<int> temp = { last_end,v.end() };
+                fut[j] = async(launch::async, worker_thread, temp);
+            }
+            else {
+                vector<int> temp = { v.begin() + n,v.begin() + n + div };
+                last_end = v.begin() + n + div;
+                fut[j] = async(launch::async, worker_thread, temp);
+                n += div;
+            }
+            
+        }
+        for (int k = 0; k < pw; k++) {
+            pair<int, int> p = fut[k].get();
+            if (p.second > max)
+                max = p.second;
+            if (p.first < min)
+                min = p.first;
+        }
+
+        chrono::system_clock::time_point end_time = chrono::system_clock::now();
+
+        chrono::duration<double> diff = end_time - start_time;
+        cout << "min: " << min << endl;
+        cout << "max: " << max << endl;
+        cout << pw << ": " << diff.count() << endl;
+        
+    }
+   
+}
+```

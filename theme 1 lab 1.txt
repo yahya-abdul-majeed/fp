@@ -1,0 +1,32 @@
+//theme 1 lab 1
+#include<iostream>
+using namespace std;
+
+int readNum() {
+    int n;
+    cin >> n;
+    return n;
+}
+
+void print(int num) {
+    cout << num;
+}
+
+int getOddDigits(int n) {
+
+    if (n == 0)
+        return 0;
+    int ret= getOddDigits(n / 10);
+    if (n % 2 != 0) {//if num is odd
+        return ret * 10 + n % 10;
+    }
+    else {
+        return ret;
+    }
+    
+}
+
+
+int main() {
+    print(getOddDigits(readNum()));
+}

@@ -1,0 +1,23 @@
+// theme 1 lab 2
+def readNum():
+    return int(input())
+
+def readArr(arr,size):
+    if len(arr)<size:
+        arr.append(readNum())
+        return readArr(arr,size)
+    return arr
+
+
+
+def read2Arr(len):
+    return (readArr([],len),readArr([],len))
+
+def sort2Arr(pair:tuple):
+    return (sorted(pair[0]),sorted(pair[1],reverse= True))
+
+def priAns(pair):
+    print(pair[0])
+    print(pair[1])
+
+priAns(sort2Arr(read2Arr(readNum())))
